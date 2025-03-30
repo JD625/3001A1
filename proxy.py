@@ -20,7 +20,8 @@ proxyPort = int(args.port)
 try:
   # Create a server socket
   # ~~~~ INSERT CODE ~~~~
-  serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+  serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  
+  #This creates a socket using the IPv4 address of AF_INET and a TCP connection which is SOCK_STREAM
   # ~~~~ END CODE INSERT ~~~~
   print ('Created socket')
 except:
@@ -31,6 +32,7 @@ try:
   # Bind the the server socket to a host and port
   # ~~~~ INSERT CODE ~~~~
   serverSocket.bind((proxyHost, proxyPort))
+  # This line binds the created socket to the specified hostname which are the IP Address and port number
   # ~~~~ END CODE INSERT ~~~~
   print ('Port is bound')
 except:
@@ -41,6 +43,7 @@ try:
   # Listen on the server socket
   # ~~~~ INSERT CODE ~~~~
   serverSocket.listen(5)
+  # This line would starts listening for the incoming connections and allowing for up to 5 queued connections
   # ~~~~ END CODE INSERT ~~~~
   print ('Listening to socket')
 except:
@@ -56,6 +59,7 @@ while True:
   try:
     # ~~~~ INSERT CODE ~~~~
     clientSocket, clientAddr = serverSocket.accept()
+    # This accepts an incoming client connection and stores the socket and address
     # ~~~~ END CODE INSERT ~~~~
     print ('Received a connection')
   except:
@@ -66,6 +70,7 @@ while True:
   # and store it in the variable: message_bytes
   # ~~~~ INSERT CODE ~~~~
   message_bytes = clientSocket.recv(BUFFER_SIZE)
+  # This reads data sent by the client, up to the BUFFER_SIZE bytes
   # ~~~~ END CODE INSERT ~~~~
   message = message_bytes.decode('utf-8')
   print ('Received request:')
@@ -119,6 +124,7 @@ while True:
     # Send back response to client 
     # ~~~~ INSERT CODE ~~~~
     clientSocket.sendall(b''.join(cacheData))
+    # This sends the cached response back to the client
     # ~~~~ END CODE INSERT ~~~~
     cacheFile.close()
     print ('Sent to the client:')
@@ -130,6 +136,7 @@ while True:
     # and store in originServerSocket
     # ~~~~ INSERT CODE ~~~~
     originServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # This would creates a new socket to connect to the origin server
     # ~~~~ END CODE INSERT ~~~~
 
     print ('Connecting to:\t\t' + hostname + '\n')
@@ -139,6 +146,7 @@ while True:
       # Connect to the origin server
       # ~~~~ INSERT CODE ~~~~
       originServerSocket.connect((address, 80))
+      # This would connects the proxy to the origin server on port 80 HTTP
       # ~~~~ END CODE INSERT ~~~~
       print ('Connected to origin Server')
 
@@ -151,6 +159,7 @@ while True:
       # ~~~~ INSERT CODE ~~~~
       originServerRequest = f'GET {resource} HTTP/1.1\r\n'
       originServerRequestHeader = f'Host: {hostname}\r\nConnection: close\r\n'
+      # These lines constructs the HTTP 'GET' request to be sent to the origin server
       # ~~~~ END CODE INSERT ~~~~
 
       # Construct the request to send to the origin server
@@ -172,11 +181,13 @@ while True:
       # Get the response from the origin server
       # ~~~~ INSERT CODE ~~~~
       response = originServerSocket.recv(BUFFER_SIZE)
+      # This would reads the response from the origin server
       # ~~~~ END CODE INSERT ~~~~
 
       # Send the response to the client
       # ~~~~ INSERT CODE ~~~~
       clientSocket.sendall(response)
+      # This would sends the received response from the origin server to the client
       # ~~~~ END CODE INSERT ~~~~
 
       # Create a new file in the cache for the requested file.
@@ -189,6 +200,7 @@ while True:
       # Save origin server response in the cache file
       # ~~~~ INSERT CODE ~~~~
       cacheFile.write(response)
+      # Writes the response from the origin server into the cache file
       # ~~~~ END CODE INSERT ~~~~
       cacheFile.close()
       print ('cache file closed')
