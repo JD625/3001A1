@@ -88,12 +88,14 @@ while True:
     resourceParts = URI.split('/', 1)
     hostname = resourceParts[0]
     resource = '/'
+    
     if len(resourceParts) == 2:
+     # Resource is absolute URI with hostname and resource
         resource = resource + resourceParts[1]
 
     print('Requested Resource:\t' + resource)
 
-    #Cache management: check if the cached file is still fresh
+    #Check if the cached file is still fresh
     try:
         cacheLocation = './' + hostname + resource
         if cacheLocation.endswith('/'):
@@ -110,16 +112,16 @@ while True:
                 #Check for Expires header in the cache file 
                 if 'Expires' in str(cacheData):
                     #Assuming we have a way to extract Expires date
-                    expires_header = re.search(r'Expires: (.+)', str(cacheData))
+                    expire_header = re.search(r'Expires: (.+)', str(cacheData))
                     #Searches for an Expires header in the cached response.
 
-                    if expires_header:
-                        expires_time = parsedate_to_datetime(expires_header.group(1))
+                    if expire_header:
+                        expire_time = parsedate_to_datetime(expire_header.group(1))
                         current_time = time.time()
                         #Converts the expiration date into a timestamp.
 
                         #If the cache has expired, fetch a new copy
-                        if expires_time.timestamp() < current_time:
+                        if expire_time.timestamp() < current_time:
                             raise Exception("Cache expired")
                         #If the cache has expired, fetching from the origin server.
                 print('Cache hit! Loading from cache file: ' + cacheLocation) 
@@ -155,7 +157,7 @@ while True:
             response = originServerSocket.recv(BUFFER_SIZE)
             clientSocket.sendall(response)
 
-            # Pre-fetch files such as images from the main HTML page
+            # Prefetch files such as images from the main HTML page
             if 'text/html' in response.decode('utf-8'):
                 prefetch_files = re.findall(r'(href|src)=[\'"]?([^\'" >]+)', response.decode('utf-8'))
                 for _, file in prefetch_files: #If the response is an HTML page then it extracts linked files using regular expressions.
